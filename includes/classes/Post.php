@@ -35,11 +35,25 @@ class Post {
 	}
 
 
-  public function loadPostsFriends(){
-      $str = "";
-      $data = mysqli_query($this->con, "SELECT * FROM posts WHERE deleted='no' ORDER BY id DESC");
+  public function loadPostsFriends($data, $limit){
 
-      while($row=mysqli_fetch_array($data)){
+    $page = $data['page']; 
+		$userLoggedIn = $this->user_obj->getUsername();
+
+		if($page == 1) 
+			$start = 0;
+		else 
+			$start = ($page - 1) * $limit;
+
+      $str = "";
+      $data_query = mysqli_query($this->con, "SELECT * FROM posts WHERE deleted='no' ORDER BY id DESC");
+      
+		if(mysqli_num_rows($data_query) > 0) {
+      $num_iterations = 0;
+			$count = 1;
+
+
+      while($row=mysqli_fetch_array($data_query)){
 
       $id = $row['id'];
       $body = $row['body'];
@@ -135,9 +149,16 @@ $time_message = $interval->s . " seconds ago";
  <br>
  </div>
 ";
+
+}
+if($count > $limit) 
+$str .= "<input type='hidden' class='nextPage' value='" . ($page + 1) . "'>
+      <input type='hidden' class='noMorePosts' value='false'>";
+else 
+$str .= "<input type='hidden' class='noMorePosts' value='true'><p style='text-align: centre;'> No more posts to show! </p>";
 echo $str;
 
-      }
+    }
   }
 
 }

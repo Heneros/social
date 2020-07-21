@@ -29,17 +29,62 @@ if(isset($_POST['post'])){
          </div>
  </div><!---->
  <div class="main_column column">
- <form action="" class="post_form" action="index.php" method="POST">
+ <form class="post_form" action="index.php" method="POST">
  <textarea name="post_text" id="post_text" placeholder="What's new?"></textarea>
  <input type="submit" name="post" id="post_button" value="Post">
 <hr>
  </form>
-<?php
 
-$post = new Post($con, $userLoggedIn);
-$post->loadPostsFriends();
+ <div class="posts_area"></div>
+		<img id="loading" src="assets/images/icons/loading.gif">
 
-?>
+<script>
+
+var userLoggedIn = '<?php echo $userLoggedIn; ?>';
+
+$(document).ready(function() {
+      $('#loading').show();
+
+      $.ajax({
+            url: "includes/handlers/ajax_load_posts.php",
+            type: "POST",
+            data: "page=1&userLoggedIn=" + userLoggedIn,
+            cache: false,
+
+            success: function(data){
+                  $('#loading').hide();
+			$('.posts_area').html(data); 
+            }
+      });
+      $(window).scroll(function(){
+            var height = $('.posts_area').height(); 
+            var scroll_top = $(this).scrollTop();
+            var page = $('.posts_area').find('.nextPage').val();
+            var noMorePosts = $('.posts_area').find('.noMorePosts').val();
+
+            if((document.body.scrollHeight == document.body.scrollTop + window.innerHeight) && noMorePosts == 'false'){
+                  $('#loading').show(); 
+
+                  var ajaxReq = $.ajax({
+                        url: "includes/handlers/ajax_load_posts.php",
+                        type: "POST",
+                        data: "page=" + page + "&userLoggedIn=" + userLoggedIn,
+                        cache: false,
+
+                        success: function(response){
+                              $('.posts_area').find('.nextPage').remove()
+                              $('.posts_area').find('.noMorePosts').remove();
+
+                              $("#loading").hide();
+                              $('.posts_area').append(response)
+                        }
+                  })
+            }
+            return false;
+      });
+});
+
+</script>
  </div>
 </div>
 </body>
