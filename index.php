@@ -44,7 +44,7 @@ var userLoggedIn = '<?php echo $userLoggedIn; ?>';
 
 $(document).ready(function() {
       $('#loading').show();
-
+ 
       $.ajax({
             url: "includes/handlers/ajax_load_posts.php",
             type: "POST",
